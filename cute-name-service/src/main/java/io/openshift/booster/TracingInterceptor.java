@@ -1,9 +1,7 @@
 package io.openshift.booster;
 
 import io.vertx.core.Handler;
-import io.vertx.ext.web.client.impl.WebClientInternal;
 import io.vertx.reactivex.ext.web.RoutingContext;
-import io.vertx.reactivex.ext.web.client.WebClient;
 
 import java.util.*;
 import java.util.function.Function;
@@ -25,9 +23,13 @@ public class TracingInterceptor {
         "user-agent"
     );
 
-    public static final String X_TRACING_HEADERS = "X-Tracing-Headers";
+    private TracingInterceptor() {
+        // Avoid direct instantiation.
+    }
 
-    public static Handler<RoutingContext> create() {
+    private static final String X_TRACING_HEADERS = "X-Tracing-Headers";
+
+    static Handler<RoutingContext> create() {
         return rc -> {
             Set<String> names = rc.request().headers().names();
             Map<String, List<String>> headers = names.stream()
@@ -40,17 +42,5 @@ public class TracingInterceptor {
             rc.put(X_TRACING_HEADERS, headers);
             rc.next();
         };
-    }
-
-    public static WebClient propagate(WebClient client, RoutingContext rc) {
-        WebClientInternal delegate = (WebClientInternal) client.getDelegate();
-        delegate.addInterceptor(ctx -> {
-            Map<String, List<String>> headers = rc.get(X_TRACING_HEADERS);
-            if (headers != null) {
-                headers.forEach((s, l) -> l.forEach(v -> ctx.request().putHeader(s, v)));
-            }
-            ctx.next();
-        });
-        return client;
     }
 }
