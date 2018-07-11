@@ -8,6 +8,12 @@ Showcase Istio’s Distributed Tracing via a (minimally) instrumented set of Ecl
 * Istio
 * Create a new project/namespace on the cluster. This is where your application will be deployed.
 
+If you are using _istiooc_, launch it with:
+
+```bash
+oc cluster up --istio
+```
+
 ```bash
 oc login -u system:admin
 oc adm policy add-cluster-role-to-user admin developer --as=system:admin
@@ -33,7 +39,7 @@ Configuration for FMP may be found both in pom.xml and `src/main/fabric8` files/
 
 
 ```bash
-oc create -f rules/redirection.yaml
+oc create -f rules/gateway.yaml
 ```
 
 ### Access the application
@@ -45,7 +51,7 @@ echo http://$(oc get route istio-ingressgateway -o jsonpath='{.spec.host}{"\n"}'
 
 ```
 
-The result of the above command is the `istio-system` `istio-ingress` URL, appended with the `RouteRule` path. Open this URL in your a web browser.
+Open this URL in your a web browser.
 
 ### Accessing the traces
 
