@@ -32,6 +32,15 @@ mvn clean fabric8:deploy -Popenshift
 
 Configuration for FMP may be found both in pom.xml and `src/main/fabric8` files/folders.
 
+### With S2I 
+
+```bash
+find . | grep openshiftio | grep application | xargs -n 1 oc apply -f
+
+oc new-app --template=vertx-istio-tracing-greeting-service -p SOURCE_REPOSITORY_URL=https://github.com/openshiftio-vertx-boosters/vertx-istio-distributed-tracing-booster -p SOURCE_REPOSITORY_REF=master -p SOURCE_REPOSITORY_DIR=greeting-service
+oc new-app --template=vertx-istio-tracing-cute-name-service -p SOURCE_REPOSITORY_URL=https://github.com/openshiftio-vertx-boosters/vertx-istio-distributed-tracing-booster -p SOURCE_REPOSITORY_REF=master -p SOURCE_REPOSITORY_DIR=cute-name-service
+```
+
 
 ## Use Cases
 
