@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  */
 public class TracingInterceptor {
 
+  //
   private static final List<String> FORWARDED_HEADER_NAMES = Arrays.asList(
     "x-request-id",
     "x-b3-traceid",
@@ -21,8 +22,7 @@ public class TracingInterceptor {
     "x-b3-parentspanid",
     "x-b3-sampled",
     "x-b3-flags",
-    "x-ot-span-context",
-    "user-agent"
+    "x-ot-span-context"
   );
 
   private static final String X_TRACING_HEADERS = "X-Tracing-Headers";
@@ -51,6 +51,7 @@ public class TracingInterceptor {
     delegate.addInterceptor(ctx -> {
       Map<String, List<String>> headers = rc.get(X_TRACING_HEADERS);
       if (headers != null) {
+        System.out.println("Propagating... " + headers);
         headers.forEach((s, l) -> l.forEach(v -> ctx.request().putHeader(s, v)));
       }
       ctx.next();

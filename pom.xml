@@ -30,8 +30,8 @@
   </properties>
 
   <modules>
-    <module>cute-name-service</module>
-    <module>greeting-service</module>
+    <module>vertx-istio-distributed-tracing-cute-name-service</module>
+    <module>vertx-istio-distributed-tracing-greeting-service</module>
   </modules>
 
   <build>
@@ -73,6 +73,22 @@
             </executions>
             <configuration>
               <skip>${skip.fmp}</skip>
+              <resources>
+                <annotations>
+                  <deployment>
+                    <property>
+                      <name>sidecar.istio.io/inject</name>
+                      <value>true</value>
+                    </property>
+                  </deployment>
+                  <service>
+                    <property>
+                      <name>auth.istio.io/8080</name>
+                      <value>NONE</value>
+                    </property>
+                  </service>
+                </annotations>
+              </resources>
             </configuration>
           </plugin>
         </plugins>

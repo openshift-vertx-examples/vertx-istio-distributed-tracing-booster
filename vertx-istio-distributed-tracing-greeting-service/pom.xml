@@ -8,14 +8,15 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>greeting-service</artifactId>
+  <artifactId>vertx-istio-distributed-tracing-greeting-service</artifactId>
   <name>Greeting Service</name>
 
   <packaging>jar</packaging>
 
   <properties>
-    <docker.skip>false</docker.skip>
+    <skip.fmp>false</skip.fmp>
     <vertx.health>/health</vertx.health>
+    <vertx.verticle>io.openshift.vertx.cache.GreetingVerticle</vertx.verticle>
   </properties>
 
   <dependencies>
@@ -34,6 +35,16 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-rx-java2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-vertx-web</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jaegertracing</groupId>
+      <artifactId>jaeger-core</artifactId>
+      <version>0.30.0</version>
     </dependency>
   </dependencies>
 
@@ -87,6 +98,22 @@
                   </vertx-health-check>
                 </config>
               </enricher>
+              <resources>
+                <annotations>
+                  <deployment>
+                    <property>
+                      <name>sidecar.istio.io/inject</name>
+                      <value>true</value>
+                    </property>
+                  </deployment>
+                  <service>
+                    <property>
+                      <name>auth.istio.io/8080</name>
+                      <value>NONE</value>
+                    </property>
+                  </service>
+                </annotations>
+              </resources>
             </configuration>
           </plugin>
         </plugins>

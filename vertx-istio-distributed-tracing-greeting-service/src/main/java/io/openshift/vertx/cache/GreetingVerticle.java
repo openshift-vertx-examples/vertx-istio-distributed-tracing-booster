@@ -1,10 +1,7 @@
 package io.openshift.vertx.cache;
 
-import io.reactivex.Completable;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.reactivex.CompletableHelper;
 import io.vertx.reactivex.core.AbstractVerticle;
@@ -18,37 +15,35 @@ import io.vertx.reactivex.ext.web.handler.StaticHandler;
 public class GreetingVerticle extends AbstractVerticle {
 
   private WebClient client;
-  private int ttl = 10;
-  private final Logger LOGGER = LoggerFactory.getLogger("Cache-Verticle");
 
   @Override
   public void start(Future<Void> future) {
-    ttl = config().getInteger("cache.ttl", 5);
-    // HTTP API
+
+    // Access to Cute name service.
+    client = WebClient.create(vertx, new WebClientOptions()
+      .setDefaultHost("vertx-istio-distributed-tracing-cute-name-service")
+      .setDefaultPort(8080)
+    );
+
     Router router = Router.router(vertx);
-    router.route().handler(BodyHandler.create());
+    router.route().handler(rc -> {
+      System.out.println(rc.request().method() + " " + rc.request().path());
+      System.out.println(rc.request().headers().names());
+      rc.next();
+    });
     router.route().handler(TracingInterceptor.create());
+    router.route().handler(BodyHandler.create());
     router.get("/api/greeting").handler(this::greeting);
     router.get("/health").handler(rc -> rc.response().end("OK"));
     router.get("/*").handler(StaticHandler.create());
 
-    // Access to Cute name service.
-    client = WebClient.create(vertx, new WebClientOptions()
-      .setDefaultHost("cute-name-service")
-      .setDefaultPort(8080)
-    );
-
-    Completable startHttpServer = vertx
+    vertx
       .createHttpServer()
       .requestHandler(router::accept)
       .rxListen(config().getInteger("http.port", 8080))
       .toCompletable()
-      .doOnComplete(() -> LOGGER.info("HTTP Server started"));
-
-    startHttpServer
       .subscribe(CompletableHelper.toObserver(future));
   }
-
 
   private void greeting(RoutingContext rc) {
     TracingInterceptor.propagate(client, rc)

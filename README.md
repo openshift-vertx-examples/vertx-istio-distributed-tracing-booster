@@ -1,84 +1,58 @@
-## Purpose 
+# Eclipse Vert.x / Istio Distributed Tracing  Booster
 
-Showcase Istio's Distributed Tracing capabilities with Eclipse Vert.x microservices.
+## Purpose
+Showcase Istio’s Distributed Tracing via a (minimally) instrumented set of Eclipse Vert.x applications
 
-## Install Istio
-
-0. You need Minishift with OpenShift 3.7+. Enable the _admin_ addon:
-
-```bash
-minishift addon enable admin-user
-```
-
-Connect to the console using the `admin/admin` credentials and generate the _oc login_ token such as:
+## Prerequisites
+* Openshift 3.9 cluster
+* Istio
+* Create a new project/namespace on the cluster. This is where your application will be deployed.
 
 ```bash
-oc login https://192.168.64.34:8443 --token=YD7y0YZTwxC30RWI2l04CzEo8m-dW40ickw5Uvn4r78
-``` 
-
-1. Create Istio service accounts
-
-```bash
-oc adm policy add-scc-to-user anyuid -z istio-ingress-service-account -n istio-system
-oc adm policy add-scc-to-user anyuid -z istio-grafana-service-account -n istio-system
-oc adm policy add-scc-to-user anyuid -z istio-prometheus-service-account -n istio-system
-```
-
-2. Download Istio
-
-```bash
-curl -L https://git.io/getLatestIstio | sh -
-```
-
-3. Install Istio and Jaeger 
-
-```bash
-cd istio-??? # use the installed version
-export PATH=$PWD/bin:$PATH
 oc login -u system:admin
-oc apply -f install/kubernetes/istio.yaml
-oc apply -n istio-system -f https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml
-oc expose service jaeger-query -n istio-system
-```
-
-4. Prepare the Namespace
-
-_This mission assumes that myproject namespace is used._
-
-Create the namespace if one does not exist
-
-```bash
-cd ..
-oc new-project myproject
-oc adm policy add-scc-to-user privileged -n myproject -z default
+oc adm policy add-cluster-role-to-user admin developer --as=system:admin
+oc login -u developer -p developer
+oc new-project <whatever valid project name you want> # not required
 ```
 
 ## Build and deploy the application
 
-```bash
-mvn package fabric8:build -Popenshift
-oc apply -f suggestion-service/src/kubernetes/Service.yml 
-oc create -f <(istioctl kube-inject -f suggestion-service/src/kubernetes/Deployment.yml)
-oc apply -f store-service/src/kubernetes/Service.yml
-oc create -f <(istioctl kube-inject -f store-service/src/kubernetes/Deployment.yml)
-oc apply -f album-service/src/kubernetes/Service.yml
-oc create -f <(istioctl kube-inject -f album-service/src/kubernetes/Deployment.yml)
-oc apply -f album-details-service/src/kubernetes/Service.yml
-oc create -f <(istioctl kube-inject -f album-details-service/src/kubernetes/Deployment.yml)
-oc expose service suggestion-service
-oc get route
-```
-
-You can use the application from the url indicated by the last command. Otherwise use the _suggestion-service_ route in 
-the OpenShift dashboard. In the application, click a few times on the two _invoke_ buttons to generate traces.
-
-
-
-## Seeing the traces
+### With Fabric8 Maven Plugin (FMP)
+Execute the following command to build the project and deploy it to OpenShift:
 
 ```bash
-oc get route -n istio-system 
+mvn clean fabric8:deploy -Popenshift
 ```
 
-Use the indicated url. Then, click on the _service_ dropdown menu and select _suggestion-service_ and click on the _Find 
-trace button_. You should see the traces. 
+Configuration for FMP may be found both in pom.xml and `src/main/fabric8` files/folders.
+
+
+## Use Cases
+
+### Configure an ingress Route to access the application
+
+
+```bash
+oc create -f rules/redirection.yaml
+```
+
+### Access the application
+
+Run the following command to determine the appropriate URL to access our demo. Make sure you access the url with the HTTP scheme. HTTPS is NOT enabled by default:
+
+```bash
+echo http://$(oc get route istio-ingressgateway -o jsonpath='{.spec.host}{"\n"}' -n istio-system)/greeting
+
+```
+
+The result of the above command is the `istio-system` `istio-ingress` URL, appended with the `RouteRule` path. Open this URL in your a web browser.
+
+### Accessing the traces
+
+Once you used the application a little bit, you should be able to see the traces.
+
+
+```bash
+echo https://$(oc get route/tracing -n istio-system  -o 'jsonpath={.spec.host}')
+# You may have to accept the certificate
+```

@@ -18,7 +18,12 @@ public class CuteNameServiceVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> future) {
         Router router = Router.router(vertx);
-        router.route().handler(TracingInterceptor.create());
+        router.route().handler(rc -> {
+          System.out.println(rc.request().method() + " " + rc.request().path());
+          System.out.println(rc.request().headers().names());
+          rc.next();
+        });
+        //router.route().handler(TracingInterceptor.create());
         router.get("/api/name").handler(this::getCuteName);
         router.get("/health").handler(rc -> rc.response().end("OK"));
 
@@ -30,11 +35,9 @@ public class CuteNameServiceVerticle extends AbstractVerticle {
     }
 
     private void getCuteName(RoutingContext rc) {
-        // Introduce a delay on purpose.
-        vertx.setTimer(2000, x ->
-            rc.response()
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("name", generate()).encode()));
+      rc.response()
+        .putHeader("content-type", "application/json")
+        .end(new JsonObject().put("name", generate()).encode());
     }
 
     private static String generate() {
