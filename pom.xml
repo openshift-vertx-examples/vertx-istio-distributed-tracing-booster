@@ -12,7 +12,7 @@
 
   <groupId>io.openshift.booster</groupId>
   <artifactId>vertx-istio-distributed-tracing-parent</artifactId>
-  <version>2</version>
+  <version>3-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
