@@ -44,7 +44,7 @@
     <dependency>
       <groupId>io.jaegertracing</groupId>
       <artifactId>jaeger-core</artifactId>
-      <version>0.30.6</version>
+      <version>0.31.0</version>
     </dependency>
   </dependencies>
 
