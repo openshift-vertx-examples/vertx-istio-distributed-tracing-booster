@@ -153,12 +153,6 @@ objects:
                 fieldPath: metadata.namespace
           image: vertx-istio-distributed-tracing-greeting-service:latest
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 180
           name: vertx
           ports:
           - containerPort: 8080
@@ -169,13 +163,7 @@ objects:
             protocol: TCP
           - containerPort: 8778
             name: jolokia
-            protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 10
+            protocol: TCP          
           securityContext:
             privileged: false
     triggers:

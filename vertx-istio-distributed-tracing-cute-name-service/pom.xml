@@ -19,8 +19,6 @@
   <properties>
     <vertx.verticle>io.openshift.booster.CuteNameServiceVerticle</vertx.verticle>
     <skip.fmp>false</skip.fmp>
-
-    <vertx.health>/health</vertx.health>
   </properties>
 
   <dependencies>
@@ -94,11 +92,6 @@
                 <excludes>
                   <exclude>f8-maven-scm</exclude>
                 </excludes>
-                <config>
-                  <vertx-health-check>
-                    <path>/health</path>
-                  </vertx-health-check>
-                </config>
               </enricher>
               <resources>
                 <annotations>
