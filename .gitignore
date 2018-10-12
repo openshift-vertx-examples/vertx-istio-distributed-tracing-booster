@@ -10,4 +10,6 @@ target
 .project
 bin
 tmp
-/istio-0.7.1/
+
+# OpenShift
+openshift.local.clusterup*
