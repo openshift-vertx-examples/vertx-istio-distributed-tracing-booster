@@ -25,7 +25,7 @@
     <skip.fmp>true</skip.fmp>
 
     <opentracing-tracer.version>0.1</opentracing-tracer.version>
-    <vertx.version>3.6.0</vertx.version>
+    <vertx.version>3.6.2</vertx.version>
     <vertx-maven-plugin.version>1.0.13</vertx-maven-plugin.version>
   </properties>
 
