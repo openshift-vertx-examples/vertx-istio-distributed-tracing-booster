@@ -34,23 +34,13 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-rx-java2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.opentracing.contrib</groupId>
-      <artifactId>opentracing-vertx-web</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.jaegertracing</groupId>
-      <artifactId>jaeger-core</artifactId>
-      <version>0.32.0</version>
-    </dependency>
+    </dependency>   
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>io.fabric8</groupId>
+        <groupId>io.reactiverse</groupId>
         <artifactId>vertx-maven-plugin</artifactId>
         <version>${vertx-maven-plugin.version}</version>
         <executions>
